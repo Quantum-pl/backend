@@ -19,7 +19,6 @@ class Product(Base):
     __tablename__ = 'products'
 
     id: Mapped[int] = Column(Integer, primary_key=True)
-    user_id: Mapped[uuid.UUID] = Column(UUID(as_uuid=True), ForeignKey("users.id"))
 
     title: Mapped[str] = Column(String, nullable=False)
     body: Mapped[str] = Column(Text, nullable=False)

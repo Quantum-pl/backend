@@ -10,7 +10,6 @@ class Session(Base):
     __tablename__ = 'sessions'
 
     id: Mapped[int] = Column(Integer, primary_key=True)
-    user_id: Mapped[uuid.UUID] = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     token: Mapped[str] = Column(String)
     refresh: Mapped[str] = Column(String)
 

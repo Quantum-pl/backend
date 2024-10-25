@@ -16,7 +16,6 @@ class Verification(Base):
 
     id: Mapped[int] = Column(Integer, primary_key=True)
     type: Mapped[VerificationType] = Column(Enum(VerificationType), nullable=False)
-    user_id: Mapped[uuid.UUID] = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     token: Mapped[str] = Column(String, nullable=False)
 
     user: Mapped["User"] = relationship("User", back_populates="products")

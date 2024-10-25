@@ -24,7 +24,6 @@ class Order(Base):
     __tablename__ = 'orders'
 
     id: Mapped[int] = Column(Integer, primary_key=True)
-    user_id: Mapped[uuid.UUID] = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     status: Mapped[OrderState] = Column(Enum(OrderState), default=OrderState.CREATED)
 
     created_at: Mapped[datetime] = Column(DateTime, default=datetime.utcnow)
