@@ -1,10 +1,16 @@
 import enum
-import uuid
 
 from datetime import datetime
-from app.database.models import Base, User, Product
-from sqlalchemy import Column, Integer, DateTime, Enum, UUID, ForeignKey, Table
+from typing import TYPE_CHECKING
+
+from app.database.models import Base
+from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey, Table
 from sqlalchemy.orm import Mapped, relationship
+
+
+if TYPE_CHECKING:
+    from app.database.models.user import User
+    from app.database.models.product import Product
 
 order_products = Table(
     "order_products", Base.metadata,

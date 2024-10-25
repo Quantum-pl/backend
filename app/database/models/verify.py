@@ -1,10 +1,14 @@
 import enum
-import uuid
 
+from typing import TYPE_CHECKING
 from app.database.models import Base, User
 
 from sqlalchemy import Column, Integer, ForeignKey, String, Enum, UUID
 from sqlalchemy.orm import Mapped, relationship
+
+
+if TYPE_CHECKING:
+    from .user import User
 
 class VerificationType(enum.Enum):
     EMAIL = "EMAIL"

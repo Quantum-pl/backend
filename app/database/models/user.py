@@ -1,10 +1,18 @@
 import uuid
 
 from datetime import datetime
-from app.database.models import Base, Order, Product, Session
+from typing import TYPE_CHECKING
+
+from app.database.models import Base
 
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, UUID
+
+
+if TYPE_CHECKING:
+    from .order import Order
+    from .product import Product
+    from .session import Session
 
 class User(Base):
     __tablename__ = 'users'

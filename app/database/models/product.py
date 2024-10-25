@@ -1,14 +1,17 @@
 import enum
-import uuid
+from typing import TYPE_CHECKING
 
 from app.database.models import Base, User, Order
 from app.database.models.order import order_products
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Enum, Table
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, Integer, String, DateTime, Text, Enum
 from sqlalchemy.orm import relationship, Mapped
 
+
+if TYPE_CHECKING:
+    from app.database.models.user import User
+    from app.database.models.order import Order
 
 class ProductState(enum.Enum):
     ACTIVE = "ACTIVE"

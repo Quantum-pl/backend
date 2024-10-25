@@ -1,10 +1,14 @@
-import uuid
-
 from datetime import datetime
+from typing import TYPE_CHECKING
+
 from app.database.models import Base, User
 
-from sqlalchemy import Column, Integer, UUID, ForeignKey, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import Mapped, relationship
+
+
+if TYPE_CHECKING:
+    from .user import User
 
 class Session(Base):
     __tablename__ = 'sessions'
