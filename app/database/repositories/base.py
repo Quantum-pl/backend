@@ -1,4 +1,6 @@
-from typing import Type, TypeVar, Generic, Dict, Any, Optional, List
+from typing import Type, TypeVar, Generic, Dict, Any, Optional, List, Union
+from uuid import UUID
+
 from sqlalchemy import select, update, delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,7 +36,7 @@ class BaseRepository(Generic[T]):
         except IntegrityError:
             await self.session.rollback()
 
-    async def get(self, entity_id: int, relations: Optional[List[str]] = None) -> Optional[T]:
+    async def get(self, entity_id: Union[int, UUID], relations: Optional[List[str]] = None) -> Optional[T]:
         """
         Получает запись из базы данных по ID.
 
@@ -67,7 +69,7 @@ class BaseRepository(Generic[T]):
 
         return await self.session.scalar(query)
 
-    async def update(self, entity_id: int, data: Dict[str, Any]) -> None:
+    async def update(self, entity_id: Union[int, UUID], data: Dict[str, Any]) -> None:
         """
         Обновляет запись в базе данных по ID, изменяя указанные поля.
 
@@ -81,7 +83,7 @@ class BaseRepository(Generic[T]):
         )
         await self.session.commit()
 
-    async def delete(self, entity_id: int) -> None:
+    async def delete(self, entity_id: Union[int, UUID]) -> None:
         """
         Удаляет запись из базы данных по ID.
 

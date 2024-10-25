@@ -1,9 +1,10 @@
+import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
 from app.database.models import Base, User
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, UUID, ForeignKey
 from sqlalchemy.orm import Mapped, relationship
 
 
@@ -20,6 +21,7 @@ class Session(Base):
     created_at: Mapped[datetime] = Column(DateTime, default=datetime.now)
     expire_at: Mapped[datetime] = Column(DateTime)
 
+    user_id: Mapped[uuid.UUID] = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     user: Mapped["User"] = relationship("User", back_populates="products")
 
     def __repr__(self):

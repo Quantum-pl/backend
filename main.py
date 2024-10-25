@@ -5,12 +5,17 @@ from fastapi import FastAPI
 from app.database import init_db
 from contextlib import asynccontextmanager
 
+from app.routers import users, auth
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
     yield
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(users.router)
+app.include_router(auth.router)
 
 @app.get("/")
 async def root():
