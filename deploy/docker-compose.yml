@@ -1,0 +1,41 @@
+services:
+    backend:
+        container_name: "Quantum-backend"
+        hostname: 'backend'
+        networks:
+            - quantum-network
+        restart: unless-stopped
+        pull_policy: build
+        depends_on:
+            - postgres
+        build:
+            context: ..
+            dockerfile: deploy/Dockerfile
+            target: production
+        environment:
+            POSTGRES_HOST: 'postgres'
+        env_file:
+            - ../.env
+        ports:
+            - "8000:8000"
+
+    postgres:
+        container_name: 'Quantum-postgres'
+        hostname: 'postgres'
+        networks:
+            - quantum-network
+        restart: unless-stopped
+        image: postgres:alpine
+        env_file:
+            - ../.env
+        ports:
+            - "5432:5432"
+        volumes:
+            - quantum-postgres:/var/lib/postgresql/data
+
+volumes:
+  quantum-postgres:
+
+networks:
+  quantum-network:
+    driver: bridge
