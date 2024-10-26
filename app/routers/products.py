@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from app.database.engine import SessionDep
 from app.database.models.product import Product, ProductState
 from app.database.repositories import ProductRepository
-from app.schemas.products import ProductCreate, ProductUpdate, ProductResponse
+from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
 
 router = APIRouter(
     prefix="/products",
