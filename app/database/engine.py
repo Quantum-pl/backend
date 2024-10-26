@@ -1,10 +1,9 @@
 from os import getenv
 from typing import Annotated
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -23,6 +22,7 @@ async_session = async_sessionmaker(
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
+
 
 async def get_session() -> AsyncSession:
     async with async_session() as session:

@@ -1,7 +1,8 @@
-from sqlmodel import SQLModel, Field, Relationship
-from typing import List, Optional, TYPE_CHECKING
-from datetime import datetime
 import uuid
+from datetime import datetime
+from typing import List, Optional, TYPE_CHECKING
+
+from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
     from .order import Order

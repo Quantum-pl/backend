@@ -1,11 +1,12 @@
 import uuid
 from datetime import datetime
 from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status, Cookie
 
-from app.database.repositories import UserRepository, SessionRepository
 from app.database.engine import SessionDep
 from app.database.models import User
+from app.database.repositories import UserRepository, SessionRepository
 
 router = APIRouter(
     prefix="/users",

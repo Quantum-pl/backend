@@ -1,10 +1,10 @@
 from typing import Type, TypeVar, Generic, Dict, Any, Optional, List, Union
 from uuid import UUID
 
-from sqlmodel import SQLModel, select, update, delete
-from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
+from sqlmodel import SQLModel, select, update, delete
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 T = TypeVar("T", bound=SQLModel)
 

@@ -1,4 +1,5 @@
 from typing import Optional
+
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.database.models import Session

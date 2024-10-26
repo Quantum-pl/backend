@@ -1,8 +1,8 @@
 from .base import BaseRepository
-from .user import UserRepository
 from .order import OrderRepository
 from .product import ProductRepository
 from .session import SessionRepository
+from .user import UserRepository
 from .verify import VerificationRepository
 
 __all__ = [

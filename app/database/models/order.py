@@ -1,14 +1,16 @@
-from sqlmodel import SQLModel, Field, Relationship
-from typing import List, Optional, TYPE_CHECKING
+import uuid
 from datetime import datetime
 from enum import Enum
-import uuid
+from typing import List, Optional, TYPE_CHECKING
+
+from sqlmodel import SQLModel, Field, Relationship
 
 from .links import OrderProductLink
 
 if TYPE_CHECKING:
     from app.database.models.user import User
     from app.database.models.product import Product
+
 
 class OrderState(str, Enum):
     PENDING = "PENDING"

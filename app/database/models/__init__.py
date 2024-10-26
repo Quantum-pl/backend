@@ -1,7 +1,7 @@
-from .user import User
 from .order import Order, OrderProductLink, OrderState
 from .product import Product, ProductState
 from .session import Session
+from .user import User
 from .verify import Verification, VerificationType
 
 __all__ = [

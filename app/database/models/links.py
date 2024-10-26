@@ -1,5 +1,7 @@
 from typing import Optional
+
 from sqlmodel import SQLModel, Field
+
 
 class OrderProductLink(SQLModel, table=True):
     __tablename__ = 'order_products'

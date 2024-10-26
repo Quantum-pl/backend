@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, Optional
-from sqlmodel import SQLModel, Field, Relationship
-from enum import Enum
 import uuid
+from enum import Enum
+from typing import TYPE_CHECKING, Optional
+
+from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
     from .user import User

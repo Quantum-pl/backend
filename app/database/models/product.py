@@ -1,15 +1,16 @@
 import uuid
-
-from sqlmodel import SQLModel, Field, Relationship
-from typing import List, Optional, TYPE_CHECKING
 from datetime import datetime
 from enum import Enum
+from typing import List, Optional, TYPE_CHECKING
+
+from sqlmodel import SQLModel, Field, Relationship
 
 from .links import OrderProductLink
 
 if TYPE_CHECKING:
     from .user import User
     from .order import Order
+
 
 class ProductState(str, Enum):
     ACTIVE = "ACTIVE"
@@ -28,4 +29,3 @@ class Product(SQLModel, table=True):
 
     user: Optional["User"] = Relationship(back_populates="products")
     orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
-
