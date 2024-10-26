@@ -1,37 +1,28 @@
-import uuid
-
+from sqlmodel import SQLModel, Field, Relationship
+from typing import List, Optional, TYPE_CHECKING
 from datetime import datetime
-from typing import TYPE_CHECKING
-
-from app.database.models import Base
-
-from sqlalchemy.orm import Mapped, relationship
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, UUID
-
+import uuid
 
 if TYPE_CHECKING:
     from .order import Order
     from .product import Product
     from .session import Session
+    from .verify import Verification
 
-class User(Base):
-    __tablename__ = 'users'
 
-    id: Mapped[uuid.UUID] = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    avatar: Mapped[str] = Column(String)
-    email: Mapped[str] = Column(String(225), nullable=False, unique=True)
-    phone: Mapped[str] = Column(String, unique=True)
-    password: Mapped[str] = Column(String, nullable=False)
-    nickname: Mapped[str] = Column(String, nullable=False)
-    isEmailVerified: Mapped[bool] = Column(Boolean, default=False)
-    flags: Mapped[int] = Column(Integer, default=0)
+class User(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    avatar: Optional[str]
+    email: str = Field(index=True, unique=True)
+    phone: Optional[str] = Field(unique=True)
+    password: str
+    nickname: str
+    is_email_verified: bool = Field(default=False)
+    flags: int = Field(default=0)
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = Field(default=None)
 
-    created_at: Mapped[datetime] = Column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = Column(DateTime, onupdate=datetime.utcnow)
-
-    sessions: Mapped[list["Session"]] = relationship("Session", back_populates="user")
-    products: Mapped[list["Product"]] = relationship("Product", back_populates="user")
-    orders: Mapped[list["Order"]] = relationship("Order", back_populates="user")
-
-    def __repr__(self):
-        return f"<User(id={self.id}, email={self.email})>"
+    sessions: List["Session"] = Relationship(back_populates="user")
+    products: List["Product"] = Relationship(back_populates="user")
+    orders: List["Order"] = Relationship(back_populates="user")
+    verifications: List["Verification"] = Relationship(back_populates="user")

@@ -1,19 +1,20 @@
 import uuid
 import bcrypt
 import secrets
+
 from datetime import datetime, timedelta
 from fastapi import APIRouter, HTTPException, status, Response, Cookie
 
-from app.database.session import SessionDep
-from app.database.models import Session
-from app.database.repositories.user import UserRepository
-from app.database.repositories.session import SessionRepository
-from app.schemas import LoginRequest
+from app.database.engine import SessionDep
+from app.database.models import Session, User
+from app.database.repositories import UserRepository, SessionRepository
+from app.schemas.auth import RegisterRequest, LoginRequest, LoginResponse
 
 router = APIRouter(
     prefix="/auth",
     tags=["auth"],
 )
+
 
 def hash_token(token: str) -> str:
     """Хэширует токен с использованием bcrypt.
@@ -23,6 +24,7 @@ def hash_token(token: str) -> str:
     """
     return bcrypt.hashpw(token.encode(), bcrypt.gensalt()).decode()
 
+
 def verify_token(token: str, hashed_token: str) -> bool:
     """Проверяет, совпадает ли токен с хэшированной версией.
 
@@ -31,6 +33,7 @@ def verify_token(token: str, hashed_token: str) -> bool:
     :return: True, если токены совпадают; иначе False.
     """
     return bcrypt.checkpw(token.encode(), hashed_token.encode())
+
 
 async def create_session(user_id: uuid.UUID, session_repo: SessionRepository) -> (str, str):
     """Создаёт новую сессию с хэшированным токеном и сроком действия.
@@ -56,7 +59,34 @@ async def create_session(user_id: uuid.UUID, session_repo: SessionRepository) ->
     await session_repo.add(new_session)
     return token, refresh_token
 
-@router.post("/login")
+
+@router.post("/register", response_model=LoginResponse)
+async def register(register_data: RegisterRequest, response: Response, db: SessionDep):
+    """Регистрирует нового пользователя, создаёт сессию и возвращает оригинальные токены."""
+    user_repo = UserRepository(db)
+    session_repo = SessionRepository(db)
+
+    existing_user = await user_repo.get_by_field("email", register_data.email)
+    if existing_user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
+
+    new_user = User(
+        id=uuid.uuid4(),
+        email=register_data.email,
+        password=hash_token(register_data.password),
+        nickname=register_data.nickname,
+        created_at=datetime.now(),
+    )
+
+    await user_repo.add(new_user)
+
+    token, refresh_token = await create_session(new_user.id, session_repo)
+    response.set_cookie(key="access_token", value=token, httponly=True, secure=True, samesite="lax")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite="lax")
+    return LoginResponse(token=token, refresh_token=refresh_token)
+
+
+@router.post("/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest, db: SessionDep, response: Response):
     """Выполняет вход пользователя, создаёт сессию и возвращает токены."""
     user_repo = UserRepository(db)
@@ -70,9 +100,10 @@ async def login(login_data: LoginRequest, db: SessionDep, response: Response):
     token, refresh_token = await create_session(user.id, session_repo)
     response.set_cookie(key="access_token", value=token, httponly=True, secure=True, samesite="lax")
     response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite="lax")
-    return {"message": "Successfully logged in"}
+    return LoginResponse(token=token, refresh_token=refresh_token)
 
-@router.post("/refresh")
+
+@router.post("/refresh", response_model=LoginResponse)
 async def refresh_token(response: Response, db: SessionDep, refresh_token: str = Cookie(...)):
     """Обновляет токен сессии, если токен обновления действителен."""
     session_repo = SessionRepository(db)
@@ -91,10 +122,11 @@ async def refresh_token(response: Response, db: SessionDep, refresh_token: str =
 
     response.set_cookie(key="access_token", value=new_token, httponly=True, secure=True, samesite="lax")
     response.set_cookie(key="refresh_token", value=new_refresh_token, httponly=True, secure=True, samesite="lax")
-    return {"message": "Successfully refreshed"}
+    return LoginResponse(token=new_token, refresh_token=new_refresh_token)
+
 
 @router.post("/logout")
-async def logout(token: str, db: SessionDep, response: Response):
+async def logout(db: SessionDep, response: Response, token: str = Cookie(...)):
     """Удаляет сессию пользователя при выходе из системы."""
     session_repo = SessionRepository(db)
     session = await session_repo.get_by_token(token)
@@ -105,4 +137,5 @@ async def logout(token: str, db: SessionDep, response: Response):
     await session_repo.delete(session.id)
     response.delete_cookie(key="access_token")
     response.delete_cookie(key="refresh_token")
+
     return {"message": "Successfully logged out"}

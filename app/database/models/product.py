@@ -1,37 +1,31 @@
-import enum
-from typing import TYPE_CHECKING
+import uuid
 
-from app.database.models import Base, User, Order
-from app.database.models.order import order_products
-
+from sqlmodel import SQLModel, Field, Relationship
+from typing import List, Optional, TYPE_CHECKING
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Text, Enum
-from sqlalchemy.orm import relationship, Mapped
+from enum import Enum
 
+from .links import OrderProductLink
 
 if TYPE_CHECKING:
-    from app.database.models.user import User
-    from app.database.models.order import Order
+    from .user import User
+    from .order import Order
 
-class ProductState(enum.Enum):
+class ProductState(str, Enum):
     ACTIVE = "ACTIVE"
     DISABLED = "DISABLED"
     OUT_OF_STOCK = "OUT_OF_STOCK"
 
-class Product(Base):
-    __tablename__ = 'products'
 
-    id: Mapped[int] = Column(Integer, primary_key=True)
+class Product(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str
+    body: str
+    price: Optional[int]
+    status: ProductState = Field(default=ProductState.ACTIVE)
+    created_at: datetime = Field(default_factory=datetime.now)
+    user_id: uuid.UUID = Field(foreign_key="user.id")
 
-    title: Mapped[str] = Column(String, nullable=False)
-    body: Mapped[str] = Column(Text, nullable=False)
-    price: Mapped[int] = Column(Integer)
+    user: Optional["User"] = Relationship(back_populates="products")
+    orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
 
-    status: Mapped[ProductState] = Column(Enum(ProductState), default=ProductState.ACTIVE)
-    created_at: Mapped[datetime] = Column(DateTime, default=datetime.now)
-
-    user: Mapped["User"] = relationship("User", back_populates="products")
-    orders: Mapped[list["Order"]] = relationship("Order", secondary=order_products, back_populates="products")
-
-    def __repr__(self):
-        return f"<Product(id={self.id}, title={self.title}, price={self.price})>"

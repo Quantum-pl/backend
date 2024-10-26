@@ -1,17 +1,17 @@
 from typing import Type, TypeVar, Generic, Dict, Any, Optional, List, Union
 from uuid import UUID
 
-from sqlalchemy import select, update, delete
+from sqlmodel import SQLModel, select, update, delete
+from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from app.database.models import Base
 
-T = TypeVar("T", bound=Base)
+T = TypeVar("T", bound=SQLModel)
+
 
 class BaseRepository(Generic[T]):
     """
-    Базовый репозиторий для работы с базовыми операциями CRUD для моделей SQLAlchemy.
+    Базовый репозиторий для работы с базовыми операциями CRUD для моделей SQLModel.
     """
 
     def __init__(self, model: Type[T], session: AsyncSession):
@@ -44,13 +44,49 @@ class BaseRepository(Generic[T]):
         :param relations: Список имен связанных сущностей для предварительной загрузки.
         :return: Объект модели или None, если запись не найдена.
         """
-        query = select(self.model).where(entity_id == self.model.id)
+        query = select(self.model).where(self.model.id == entity_id)
 
         if relations:
             for relation in relations:
                 query = query.options(selectinload(getattr(self.model, relation)))
 
-        return await self.session.scalar(query)
+        result = await self.session.exec(query)
+        return result.one_or_none()  # Получаем одну запись или None
+
+    async def get_all(
+            self,
+            filters: Optional[Dict[str, Any]] = None,
+            relations: Optional[List[str]] = None,
+            limit: Optional[int] = None,
+            offset: Optional[int] = None
+    ) -> List[T]:
+        """
+        Получает список всех записей из базы данных с опциональными фильтрами и связями.
+
+        :param filters: Словарь с полями и значениями для фильтрации записей.
+        :param relations: Список имен связанных сущностей для предварительной загрузки.
+        :param limit: Лимит записей, которые нужно вернуть.
+        :param offset: Смещение записей для пагинации.
+        :return: Список объектов модели, удовлетворяющих фильтрам.
+        """
+        query = select(self.model)
+
+        if filters:
+            for field_name, value in filters.items():
+                query = query.where(getattr(self.model, field_name) == value)
+
+        if relations:
+            for relation in relations:
+                query = query.options(selectinload(getattr(self.model, relation)))
+
+        if limit:
+            query = query.limit(limit)
+
+        if offset:
+            query = query.offset(offset)
+
+        result = await self.session.exec(query)
+        return result.all()
 
     async def get_by_field(self, field_name: str, value: Any, relations: Optional[List[str]] = None) -> Optional[T]:
         """
@@ -67,7 +103,8 @@ class BaseRepository(Generic[T]):
             for relation in relations:
                 query = query.options(selectinload(getattr(self.model, relation)))
 
-        return await self.session.scalar(query)
+        result = await self.session.exec(query)
+        return result.one_or_none()
 
     async def update(self, entity_id: Union[int, UUID], data: Dict[str, Any]) -> None:
         """
@@ -76,9 +113,9 @@ class BaseRepository(Generic[T]):
         :param entity_id: Идентификатор записи, которую нужно обновить.
         :param data: Словарь с данными для обновления (имена полей и новые значения).
         """
-        await self.session.execute(
+        await self.session.exec(
             update(self.model)
-            .where(entity_id == self.model.id)
+            .where(self.model.id == entity_id)
             .values(**data)
         )
         await self.session.commit()
@@ -89,7 +126,7 @@ class BaseRepository(Generic[T]):
 
         :param entity_id: Идентификатор записи, которую нужно удалить.
         """
-        await self.session.execute(
-            delete(self.model).where(entity_id == self.model.id)
+        await self.session.exec(
+            delete(self.model).where(self.model.id == entity_id)
         )
         await self.session.commit()

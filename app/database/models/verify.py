@@ -1,28 +1,21 @@
-import enum
-
-from typing import TYPE_CHECKING
-from app.database.models import Base, User
-
-from sqlalchemy import Column, Integer, ForeignKey, String, Enum, UUID
-from sqlalchemy.orm import Mapped, relationship
-
+from typing import TYPE_CHECKING, Optional
+from sqlmodel import SQLModel, Field, Relationship
+from enum import Enum
+import uuid
 
 if TYPE_CHECKING:
     from .user import User
 
-class VerificationType(enum.Enum):
+
+class VerificationType(str, Enum):
     EMAIL = "EMAIL"
     PASSWORD_RESET = "PASSWORD_RESET"
 
 
-class Verification(Base):
-    __tablename__ = 'verifications'
+class Verification(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    type: VerificationType
+    token: str
 
-    id: Mapped[int] = Column(Integer, primary_key=True)
-    type: Mapped[VerificationType] = Column(Enum(VerificationType), nullable=False)
-    token: Mapped[str] = Column(String, nullable=False)
-
-    user: Mapped["User"] = relationship("User", back_populates="products")
-
-    def __repr__(self):
-        return f"<Verification(id={self.id}, token={self.token})>"
+    user_id: uuid.UUID = Field(foreign_key="user.id")
+    user: Optional["User"] = Relationship(back_populates="verifications")

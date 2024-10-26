@@ -1,28 +1,18 @@
-import uuid
+from typing import TYPE_CHECKING, Optional
+from sqlmodel import SQLModel, Field, Relationship
 from datetime import datetime
-from typing import TYPE_CHECKING
-
-from app.database.models import Base, User
-
-from sqlalchemy import Column, Integer, String, DateTime, UUID, ForeignKey
-from sqlalchemy.orm import Mapped, relationship
-
+import uuid
 
 if TYPE_CHECKING:
     from .user import User
 
-class Session(Base):
-    __tablename__ = 'sessions'
 
-    id: Mapped[int] = Column(Integer, primary_key=True)
-    token: Mapped[str] = Column(String)
-    refresh: Mapped[str] = Column(String)
+class Session(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    token: str
+    refresh: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    expire_at: datetime
 
-    created_at: Mapped[datetime] = Column(DateTime, default=datetime.now)
-    expire_at: Mapped[datetime] = Column(DateTime)
-
-    user_id: Mapped[uuid.UUID] = Column(UUID(as_uuid=True), ForeignKey("users.id"))
-    user: Mapped["User"] = relationship("User", back_populates="products")
-
-    def __repr__(self):
-        return f"<Session(id={self.id}, user_id={self.user_id})>"
+    user_id: uuid.UUID = Field(foreign_key="user.id")
+    user: Optional["User"] = Relationship(back_populates="sessions")

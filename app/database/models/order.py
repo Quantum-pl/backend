@@ -1,41 +1,28 @@
-import enum
-
+from sqlmodel import SQLModel, Field, Relationship
+from typing import List, Optional, TYPE_CHECKING
 from datetime import datetime
-from typing import TYPE_CHECKING
+from enum import Enum
+import uuid
 
-from app.database.models import Base
-from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey, Table
-from sqlalchemy.orm import Mapped, relationship
-
+from .links import OrderProductLink
 
 if TYPE_CHECKING:
     from app.database.models.user import User
     from app.database.models.product import Product
 
-order_products = Table(
-    "order_products", Base.metadata,
-    Column("order_id", ForeignKey("orders.id"), primary_key=True),
-    Column("product_id", ForeignKey("products.id"), primary_key=True)
-)
-
-class OrderState(enum.Enum):
-    PENDING = enum.auto()
-    CREATED = enum.auto()
-    ACCEPTED = enum.auto()
-    IN_TRANSIT = enum.auto()
-    DELIVERED = enum.auto()
+class OrderState(str, Enum):
+    PENDING = "PENDING"
+    CREATED = "CREATED"
+    ACCEPTED = "ACCEPTED"
+    IN_TRANSIT = "IN_TRANSIT"
+    DELIVERED = "DELIVERED"
 
 
-class Order(Base):
-    __tablename__ = 'orders'
+class Order(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    status: OrderState = Field(default=OrderState.CREATED)
+    created_at: datetime = Field(default_factory=datetime.now)
+    user_id: uuid.UUID = Field(foreign_key="user.id")
 
-    id: Mapped[int] = Column(Integer, primary_key=True)
-    status: Mapped[OrderState] = Column(Enum(OrderState), default=OrderState.CREATED)
-
-    created_at: Mapped[datetime] = Column(DateTime, default=datetime.utcnow)
-
-    user: Mapped["User"] = relationship("User", back_populates="orders")
-    products: Mapped[list["Product"]] = relationship("Product", secondary=order_products, back_populates="orders")
-
-    def __repr__(self):
-        return f"<Order(id={self.id}, user_id={self.user_id}, status={self.status})>"
+    user: Optional["User"] = Relationship(back_populates="orders")
+    products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink)
