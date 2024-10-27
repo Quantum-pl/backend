@@ -74,8 +74,8 @@ async def refresh(response: Response, db: SessionDep, refresh_token: str = Cooki
     new_token = secrets.token_urlsafe(32)
     new_refresh_token = secrets.token_urlsafe(32)
     await session_repo.update(session.id, {
-        "token": hash_token(new_token),
-        "refresh": hash_token(new_refresh_token),
+        "access_token": hash_token(new_token),
+        "refresh_token": hash_token(new_refresh_token),
         "expire_at": datetime.now() + timedelta(days=7)
     })
 

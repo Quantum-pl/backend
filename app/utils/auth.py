@@ -4,11 +4,9 @@ import secrets
 import uuid
 from datetime import datetime, timedelta
 
-from app.config import Settings
+from app.config import settings
 from app.database.models import Session
 from app.database.repositories import SessionRepository
-
-settings = Settings()
 
 
 def hash_token(token: str) -> str:
@@ -44,8 +42,8 @@ async def create_session(user_id: uuid.UUID, session_repo: SessionRepository) ->
     hashed_refresh_token = hash_token(refresh_token)
 
     new_session = Session(
-        token=hashed_token,
-        refresh=hashed_refresh_token,
+        access_token=hashed_token,
+        refresh_token=hashed_refresh_token,
         user_id=user_id,
         created_at=datetime.now(),
         expire_at=datetime.now() + timedelta(days=7)

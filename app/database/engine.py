@@ -5,12 +5,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.config import Settings
+from app.config import settings
 
-settings = Settings()
-database_url = f"postgresql+asyncpg://{settings.db_user}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
-engine = create_async_engine(database_url)
 
+engine = create_async_engine(settings.db_url)
 async_session = async_sessionmaker(
     engine,
     class_=AsyncSession,
@@ -25,7 +23,11 @@ async def init_db():
 
 async def get_session() -> AsyncSession:
     async with async_session() as session:
-        yield session
+        try:
+            yield session
+        finally:
+            await session.commit()
+            await session.close()
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]

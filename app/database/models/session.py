@@ -9,11 +9,15 @@ if TYPE_CHECKING:
 
 
 class Session(SQLModel, table=True):
+    __tablename__ = 'sessions'
+
     id: Optional[int] = Field(default=None, primary_key=True)
-    token: str
-    refresh: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    user_id: uuid.UUID = Field(foreign_key="user.id")
+
+    access_token: str
+    refresh_token: str
+
+    created_at: datetime = Field(default_factory=datetime.now)
     expire_at: datetime
 
-    user_id: uuid.UUID = Field(foreign_key="user.id")
     user: Optional["User"] = Relationship(back_populates="sessions")

@@ -21,6 +21,8 @@ class OrderState(str, Enum):
 
 
 class Order(SQLModel, table=True):
+    __tablename__ = 'orders'
+
     id: Optional[int] = Field(default=None, primary_key=True)
     status: OrderState = Field(default=OrderState.CREATED)
     created_at: datetime = Field(default_factory=datetime.now)
