@@ -34,11 +34,13 @@
 │   ├── users            # Схемы для пользователей
 │   ├── orders           # Схемы для заказов
 │   └── products         # Схемы для продуктов
+├── __main__.py          # Точка входа для uvicorn
 ├── config.py            # Конфиг сервера
-└── main.py              # Точка входа для приложения FastAPI
+└── server.py            # Сервер с FastAPI
 /deploy
-├── Dockerfile           # Dockerfile для сборки образа
-└── docker-compose.yml   # Конфигурация для Docker Compose
+└── Dockerfile           # Dockerfile для сборки образа
+
+docker-compose.yml       # Конфигурация для Docker Compose
 ```
 
 ## Установка
@@ -61,7 +63,7 @@
 
 1. **Соберите Docker-образ и запустите контейнеры:**
    ```bash
-   docker-compose up --build -d
+   docker-compose up -d
    ```
 
 2. **Проверьте статус контейнеров:**
