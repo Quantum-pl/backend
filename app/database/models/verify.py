@@ -16,7 +16,7 @@ class VerificationType(str, Enum):
 
 class Verification(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: uuid.UUID = Field(foreign_key="user.id")
+    user_id: uuid.UUID = Field(foreign_key="users.id")
 
     type: VerificationType
     verification_code: str

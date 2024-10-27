@@ -24,9 +24,10 @@ class Order(SQLModel, table=True):
     __tablename__ = 'orders'
 
     id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="users.id")
+
     status: OrderState = Field(default=OrderState.CREATED)
     created_at: datetime = Field(default_factory=datetime.now)
-    user_id: uuid.UUID = Field(foreign_key="user.id")
 
     user: Optional["User"] = Relationship(back_populates="orders")
     products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink)

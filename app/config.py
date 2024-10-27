@@ -37,6 +37,7 @@ class Settings(BaseSettings):
 
     # Current environment
     environment: str = "dev"
+    secret_key: str = ""
 
     log_level: LogLevel = LogLevel.INFO
     # Variables for the database
@@ -44,7 +45,7 @@ class Settings(BaseSettings):
     db_port: int = 5432
     db_user: str = "backend"
     db_pass: str = "backend"
-    db_base: str = "admin"
+    db_name: str = "admin"
     db_echo: bool = False
 
     # Variables for ElasticSearch
@@ -81,7 +82,7 @@ class Settings(BaseSettings):
             port=self.db_port,
             user=self.db_user,
             password=self.db_pass,
-            path=f"/{self.db_base}",
+            path=f"/{self.db_name}",
         )
 
     @property

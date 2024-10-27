@@ -11,7 +11,6 @@ ENV PYTHONUNBUFFERED=1 \
   VENV_PATH="/opt/pysetup/.venv"
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
-
 FROM base AS builder
 RUN --mount=type=cache,target=/root/.cache \
   pip install "poetry"
@@ -20,11 +19,9 @@ COPY ./poetry.lock ./pyproject.toml ./
 RUN --mount=type=cache,target=$POETRY_HOME/pypoetry/cache \
   poetry install --no-dev
 
-
 FROM base AS production
 ENV FASTAPI_ENV=production
 COPY --from=builder $VENV_PATH $VENV_PATH
 COPY ./app /app
 
-EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "app"]

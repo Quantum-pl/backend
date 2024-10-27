@@ -7,7 +7,6 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.config import settings
 
-
 engine = create_async_engine(str(settings.db_url))
 async_session = async_sessionmaker(
     engine,
@@ -23,11 +22,7 @@ async def init_db():
 
 async def get_session() -> AsyncSession:
     async with async_session() as session:
-        try:
-            yield session
-        finally:
-            await session.commit()
-            await session.close()
+        yield session
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]

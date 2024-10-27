@@ -12,7 +12,7 @@ class Session(SQLModel, table=True):
     __tablename__ = 'sessions'
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: uuid.UUID = Field(foreign_key="user.id")
+    user_id: uuid.UUID = Field(foreign_key="users.id")
 
     access_token: str
     refresh_token: str
