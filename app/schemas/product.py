@@ -18,7 +18,6 @@ class ProductBase(BaseModel):
 
 class ProductCreate(ProductBase):
     """Схема для создания продукта."""
-    status: Optional[ProductState] = ProductState.ACTIVE
 
 
 class ProductUpdate(BaseModel):
@@ -26,7 +25,6 @@ class ProductUpdate(BaseModel):
     title: Optional[str] = Field(None, max_length=255)
     body: Optional[str]
     price: Optional[int]
-    status: Optional[ProductState]
 
 
 class ProductResponse(ProductBase):

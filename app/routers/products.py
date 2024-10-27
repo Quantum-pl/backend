@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from app.database.engine import SessionDep
 from app.database.models.product import Product, ProductState
 from app.database.repositories import ProductRepository
+from app.middleware.auth import AuthMiddlewareDep
 from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
 
 router = APIRouter(
@@ -22,7 +23,7 @@ async def get_all_products(db: SessionDep):
 
 
 @router.post("/", response_model=ProductResponse)
-async def create_product(product_data: ProductCreate, db: SessionDep):
+async def create_product(product_data: ProductCreate, db: SessionDep, user: AuthMiddlewareDep):
     product_repo = ProductRepository(db)
     new_product = Product(
         title=product_data.title,
@@ -30,14 +31,18 @@ async def create_product(product_data: ProductCreate, db: SessionDep):
         price=product_data.price,
         status=ProductState.ACTIVE
     )
+
     await product_repo.add(new_product)
     return new_product
 
 
 @router.put("/{product_id}", response_model=ProductResponse)
-async def update_product(product_id: int, product_data: ProductUpdate, db: SessionDep):
+async def update_product(product_id: int, product_data: ProductUpdate, db: SessionDep, user: AuthMiddlewareDep):
     product_repo = ProductRepository(db)
     product = await product_repo.get(product_id)
+
+    if product.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized")
 
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
@@ -50,9 +55,12 @@ async def update_product(product_id: int, product_data: ProductUpdate, db: Sessi
 
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_product(product_id: int, db: SessionDep):
+async def delete_product(product_id: int, db: SessionDep, user: AuthMiddlewareDep):
     product_repo = ProductRepository(db)
     product = await product_repo.get(product_id)
+
+    if product.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized")
 
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
