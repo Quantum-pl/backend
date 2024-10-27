@@ -12,7 +12,6 @@ uvicorn = "^0.32.0"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
 python-dotenv = "^1.0.1"
 asyncpg = "^0.30.0"
-bcrypt = "^4.2.0"
 pydantic = {extras = ["email"], version = "^2.9.2"}
 sqlmodel = "^0.0.22"
 pydantic-settings = "^2.6.0"

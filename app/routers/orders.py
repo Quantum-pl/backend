@@ -13,6 +13,7 @@ router = APIRouter(
     tags=["orders"]
 )
 
+
 @router.get("/", response_model=List[OrderResponse])
 async def get_all_products(db: SessionDep):
     """Получить список всех продуктов."""

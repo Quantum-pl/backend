@@ -4,8 +4,8 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import users, auth, orders, products
 from app.database import init_db
+from app.routers import users, auth, orders, products
 
 
 @asynccontextmanager
@@ -19,7 +19,6 @@ app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(orders.router)
 app.include_router(products.router)
-
 
 origins = [
     "http://localhost",

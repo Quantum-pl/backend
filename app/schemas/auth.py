@@ -5,7 +5,8 @@ class RegisterRequest(BaseModel):
     """Схема для регистрации нового пользователя."""
     email: EmailStr
     password: str
-    nickname: str
+    first_name: str
+    last_name: str
 
 
 class LoginRequest(BaseModel):

@@ -1,12 +1,11 @@
 import uuid
-from datetime import datetime
-from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status, Cookie
+from fastapi import APIRouter, HTTPException, status
 
 from app.database.engine import SessionDep
-from app.database.models import User
-from app.database.repositories import UserRepository, SessionRepository
+from app.database.repositories import UserRepository
+from app.middleware.auth import AuthMiddlewareDep
+from app.schemas.user import UserRead
 
 router = APIRouter(
     prefix="/users",
@@ -14,42 +13,17 @@ router = APIRouter(
 )
 
 
-async def get_current_user(session: SessionDep, access_token: str = Cookie(...)) -> Optional[User]:
-    """
-    Проверяет токен, чтобы найти и вернуть текущего пользователя.
-    """
-    session_repo = SessionRepository(session)
-
-    db_session = await session_repo.get_by_token(access_token)
-    if db_session is None or db_session.expire_at < datetime.now():
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token"
-        )
-
-    user_repo = UserRepository(session)
-    user = await user_repo.get(db_session.user_id)
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
-
-    return user
-
-
-@router.get("/me")
+@router.get("/me", response_model=UserRead)
 async def read_user_me(
-        current_user: User = Depends(get_current_user)
+        current_user: AuthMiddlewareDep
 ):
     """
     Возвращает информацию о текущем авторизованном пользователе.
     """
-    return {"username": current_user.nickname, "email": current_user.email}
+    return current_user
 
 
-@router.get("/{id}")
+@router.get("/{id}", response_model=UserRead)
 async def read_user(id: uuid.UUID, session: SessionDep):
     """
     Находит и возвращает информацию о пользователе по имени пользователя.
@@ -63,4 +37,4 @@ async def read_user(id: uuid.UUID, session: SessionDep):
             detail="User not found"
         )
 
-    return {"username": user.nickname}
+    return user

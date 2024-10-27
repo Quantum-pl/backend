@@ -1,36 +1,35 @@
 from datetime import datetime
+from typing import Annotated
 
-from fastapi import FastAPI, Request, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Request, HTTPException, status, Depends
 
-from app.database.repositories import UserRepository, SessionRepository
+from app.database.engine import SessionDep
+from app.database.models import User
+from app.database.repositories import SessionRepository
+from app.utils.auth import hash_token
 
 
-class AuthMiddleware:
-    def __init__(self, app: FastAPI):
-        self.app = app
+async def get_authorization(request: Request, session: SessionDep):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication credentials were not provided"
+        )
 
-    async def __call__(self, request: Request, call_next):
-        token = request.cookies.get("access_token")
-        if not token:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Authentication credentials were not provided"
-            )
+    session_repo = SessionRepository(session)
+    db_session = await session_repo.get_by_token(hash_token(token), relations=["user"])
 
-        session: AsyncSession = request.state.session
-        session_repo = SessionRepository(session)
-        db_session = await session_repo.get_by_token(token)
+    if db_session is None or db_session.expire_at < datetime.now():
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
 
-        if db_session is None or db_session.expire_at < datetime.now():
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+    user = db_session.user
 
-        user_repo = UserRepository(session)
-        user = await user_repo.get(db_session.user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    request.state.current_user = user
+    return user
 
-        request.state.current_user = user
-        response = await call_next(request)
-        return response
+
+AuthMiddlewareDep = Annotated[User, Depends(get_authorization)]

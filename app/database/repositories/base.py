@@ -35,6 +35,7 @@ class BaseRepository(Generic[T]):
             await self.session.commit()
         except IntegrityError:
             await self.session.rollback()
+            raise IntegrityError
 
     async def get(self, entity_id: Union[int, UUID], relations: Optional[List[str]] = None) -> Optional[T]:
         """

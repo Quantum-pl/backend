@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -19,11 +19,12 @@ class VerificationRepository(BaseRepository[Verification]):
         """
         super().__init__(Verification, session)
 
-    async def get_by_token(self, token: str) -> Optional[Verification]:
+    async def get_by_token(self, token: str, relations: Optional[List[str]] = None) -> Optional[Verification]:
         """
         Ищет запись в таблице Verification по значению токена.
 
         :param token: Значение токена для поиска записи.
-        :return: Объект Verification или None, если запись не найдена.
+        :param relations: Список имен связанных сущностей для предварительной загрузки.
+        :return: Объект Session или None, если запись не найдена.
         """
-        return await self.get_by_field("token", token)
+        return await self.get_by_field("token", token, relations)

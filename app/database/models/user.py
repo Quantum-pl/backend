@@ -17,7 +17,8 @@ class User(SQLModel, table=True):
     email: str = Field(index=True, unique=True)
     phone: Optional[str] = Field(unique=True)
     password: str
-    nickname: str
+    first_name: str
+    last_name: str
     is_email_verified: bool = Field(default=False)
     flags: int = Field(default=0)
     created_at: datetime = Field(default_factory=datetime.now)
