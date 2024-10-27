@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "Quantum"
+name = "quantum"
 version = "0.1.0"
 description = ""
 authors = ["Ultard <glebpozbnakov62@gmail.com>"]

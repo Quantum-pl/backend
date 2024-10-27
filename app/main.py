@@ -1,7 +1,6 @@
 import importlib.metadata
 from contextlib import asynccontextmanager
 
-import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,10 +14,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(
-    lifespan=lifespan,
-    version=importlib.metadata.version('Quantum')
-)
+app = FastAPI(lifespan=lifespan)
 app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(orders.router)
