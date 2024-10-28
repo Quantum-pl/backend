@@ -1,7 +1,7 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.database.models import Product
-from app.database.repositories.base import BaseRepository
+from libs.database.models import Product
+from libs.database.repositories import BaseRepository
 
 
 class ProductRepository(BaseRepository[Product]):

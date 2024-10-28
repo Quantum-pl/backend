@@ -2,8 +2,8 @@ from typing import Optional, List
 
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.database.models import Session
-from app.database.repositories.base import BaseRepository
+from libs.database.models import Session
+from libs.database.repositories import BaseRepository
 
 
 class SessionRepository(BaseRepository[Session]):

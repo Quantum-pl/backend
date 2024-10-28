@@ -5,8 +5,8 @@ import uuid
 from datetime import datetime, timedelta
 
 from app.config import settings
-from app.database.models import Session
-from app.database.repositories import SessionRepository
+from libs.database.models import Session
+from libs.database.repositories import SessionRepository
 
 
 def hash_token(token: str) -> str:

@@ -3,9 +3,9 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException, status
 
-from app.database.engine import SessionDep
-from app.database.models.order import Order, OrderState
-from app.database.repositories.order import OrderRepository
+from libs.database import SessionDep
+from libs.database.models import Order, OrderState
+from libs.database.repositories import OrderRepository
 from app.schemas.order import OrderCreate, OrderUpdate, OrderResponse
 
 router = APIRouter(

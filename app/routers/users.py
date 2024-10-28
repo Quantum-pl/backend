@@ -2,8 +2,8 @@ import uuid
 
 from fastapi import APIRouter, HTTPException, status
 
-from app.database.engine import SessionDep
-from app.database.repositories import UserRepository
+from libs.database import SessionDep
+from libs.database.repositories import UserRepository
 from app.middleware.auth import AuthMiddlewareDep
 from app.schemas.user import UserRead
 

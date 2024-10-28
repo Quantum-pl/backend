@@ -69,6 +69,12 @@ class Settings(BaseSettings):
     rabbit_pool_size: int = 2
     rabbit_channel_pool_size: int = 10
 
+    # Variables for the mail service
+    smtp_host: str = "backend-smtp"
+    smtp_port: int = 587
+    smtp_user: str = "backend"
+    smtp_pass: str = "backend"
+
     @property
     def db_url(self) -> URL:
         """
@@ -135,7 +141,6 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_prefix="BACKEND_",
         env_file_encoding="utf-8",
     )
 

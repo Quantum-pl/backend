@@ -22,6 +22,8 @@ RUN --mount=type=cache,target=$POETRY_HOME/pypoetry/cache \
 FROM base AS production
 ENV FASTAPI_ENV=production
 COPY --from=builder $VENV_PATH $VENV_PATH
-COPY ./app /app
+COPY . /src
 
+WORKDIR /src
+ENV PYTHONPATH=.
 CMD ["python", "-m", "app"]

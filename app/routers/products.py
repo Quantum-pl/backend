@@ -2,9 +2,9 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException, status
 
-from app.database.engine import SessionDep
-from app.database.models.product import Product, ProductState
-from app.database.repositories import ProductRepository
+from libs.database import SessionDep
+from libs.database.models import Product, ProductState
+from libs.database.repositories import ProductRepository
 from app.middleware.auth import AuthMiddlewareDep
 from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
 

@@ -3,9 +3,9 @@ from typing import Annotated
 
 from fastapi import Request, HTTPException, status, Depends
 
-from app.database.engine import SessionDep
-from app.database.models import User
-from app.database.repositories import SessionRepository
+from libs.database import SessionDep
+from libs.database.models import User
+from libs.database.repositories import SessionRepository
 from app.utils.auth import hash_token
 
 

@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 
 from fastapi import APIRouter, HTTPException, status, Response, Cookie
 
-from app.database.engine import SessionDep
-from app.database.models import User
-from app.database.repositories import UserRepository, SessionRepository
+from libs.database import SessionDep
+from libs.database.models import User
+from libs.database.repositories import UserRepository, SessionRepository
 from app.schemas.auth import RegisterRequest, LoginRequest
 from app.utils.auth import hash_token, verify_token, create_session
 

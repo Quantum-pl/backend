@@ -8,8 +8,8 @@ from sqlmodel import SQLModel, Field, Relationship
 from .links import OrderProductLink
 
 if TYPE_CHECKING:
-    from app.database.models.user import User
-    from app.database.models.product import Product
+    from libs.database.models.user import User
+    from libs.database.models.product import Product
 
 
 class OrderState(str, Enum):
