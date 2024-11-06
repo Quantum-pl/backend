@@ -25,7 +25,7 @@ class SessionRepository(BaseRepository[Session]):
         """
         return await self.get_by_field("refresh", refresh_token, relations)
 
-    async def get_by_token(self, token: str, relations: Optional[List[str]] = None) -> Optional[Session]:
+    async def get_by_access_token(self, token: str, relations: Optional[List[str]] = None) -> Optional[Session]:
         """
         Ищет запись в таблице Session по значению токена.
 
@@ -33,4 +33,4 @@ class SessionRepository(BaseRepository[Session]):
         :param relations: Список имен связанных сущностей для предварительной загрузки.
         :return: Объект Session или None, если запись не найдена.
         """
-        return await self.get_by_field("token", token, relations)
+        return await self.get_by_field("access_token", token, relations)

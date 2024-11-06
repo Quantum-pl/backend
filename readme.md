@@ -16,10 +16,6 @@
 
 ```plaintext
 /app
-├── database             # Настройки базы данных и файлы, связанные с моделями
-│   ├── engine.py        # Настройка подключения к базе данных
-│   ├── models           # Модели данных SQLModel
-│   └── repositories     # Репозитории для работы с базой данных
 ├── routes               # API-маршруты
 │   ├── auth             # Аутентификация
 │   ├── users            # Маршруты для работы с пользователями
@@ -37,6 +33,15 @@
 ├── __main__.py          # Точка входа для uvicorn
 ├── config.py            # Конфиг сервера
 └── server.py            # Сервер с FastAPI
+/libs
+├── database             # Настройки базы данных и файлы, связанные с моделями
+│   ├── engine.py        # Настройка подключения к базе данных
+│   ├── models           # Модели данных SQLModel
+│   └── repositories     # Репозитории для работы с базой данных
+├── elastic              # Библиотека elasticsearch
+│   ├── client.py        # Настройка подключения к elastic
+│   └── repository.py       # Репозиторий для работы с индексами elastic
+└── __init__.py
 /deploy
 └── Dockerfile           # Dockerfile для сборки образа
 

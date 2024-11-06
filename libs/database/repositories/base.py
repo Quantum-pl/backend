@@ -52,7 +52,7 @@ class BaseRepository(Generic[T]):
                 query = query.options(selectinload(getattr(self.model, relation)))
 
         result = await self.session.exec(query)
-        return result.one_or_none()  # Получаем одну запись или None
+        return result.one_or_none()
 
     async def get_all(
             self,
@@ -107,12 +107,12 @@ class BaseRepository(Generic[T]):
         result = await self.session.exec(query)
         return result.one_or_none()
 
-    async def update(self, entity_id: Union[int, UUID], data: Dict[str, Any]) -> None:
+    async def update(self, entity_id: Union[int, UUID], data: Union[T, Dict[str, Any]]) -> None:
         """
         Обновляет запись в базе данных по ID, изменяя указанные поля.
 
         :param entity_id: Идентификатор записи, которую нужно обновить.
-        :param data: Словарь с данными для обновления (имена полей и новые значения).
+        :param data: Словарь с данными для обновления (имена полей и новые значения) или изменённая модель.
         """
         await self.session.exec(
             update(self.model)

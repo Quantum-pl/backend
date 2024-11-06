@@ -51,6 +51,8 @@ class Settings(BaseSettings):
     # Variables for ElasticSearch
     elastic_host: str = "localhost"
     elastic_port: int = 9200
+    elastic_user: Optional[str] = None
+    elastic_pass: Optional[str] = None
 
     # Variables for Redis
     redis_host: str = "backend-redis"
@@ -134,9 +136,11 @@ class Settings(BaseSettings):
         :return: elastic URL.
         """
         return URL.build(
-            scheme="http",
+            scheme="https" if self.elastic_pass else "http",
             host=self.elastic_host,
             port=self.elastic_port,
+            user=self.elastic_user,
+            password=self.elastic_pass,
         )
 
     model_config = SettingsConfigDict(

@@ -1,4 +1,5 @@
 import uvicorn
+
 from app.config import settings
 
 if __name__ == "__main__":
@@ -8,6 +9,8 @@ if __name__ == "__main__":
         host=settings.host,
         port=settings.port,
         reload=settings.reload,
+        lifespan="on",
         log_level=settings.log_level.value.lower(),
+        server_header=False,
         factory=True,
     )

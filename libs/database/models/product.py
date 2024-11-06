@@ -21,12 +21,12 @@ class ProductState(str, Enum):
 class Product(SQLModel, table=True):
     __tablename__ = 'products'
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="users.id")
 
     title: str
-    body: str
-    price: Optional[int]
+    description: str
+    price: int
     status: ProductState = Field(default=ProductState.ACTIVE)
     created_at: datetime = Field(default_factory=datetime.now)
 

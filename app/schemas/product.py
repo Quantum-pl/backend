@@ -1,5 +1,6 @@
+import uuid
 from enum import Enum
-from typing import Optional
+from typing import Optional, Dict, Any, List
 
 from pydantic import BaseModel, Field
 
@@ -12,7 +13,7 @@ class ProductState(str, Enum):
 
 class ProductBase(BaseModel):
     title: str = Field(..., max_length=255)
-    body: str
+    description: str
     price: int
 
 
@@ -23,13 +24,23 @@ class ProductCreate(ProductBase):
 class ProductUpdate(BaseModel):
     """Схема для обновления продукта."""
     title: Optional[str] = Field(None, max_length=255)
-    body: Optional[str]
+    description: Optional[str]
     price: Optional[int]
+
+
+class ProductSearchRequest(BaseModel):
+    """Схема для запроса поиска продуктов."""
+    query: Optional[str] = None
+    limit: Optional[int] = 10
+    cursor: Optional[str] = None
+
+    filters: Optional[Dict[str, Any]] = None
+    sort: Optional[List[str]] = None
 
 
 class ProductResponse(ProductBase):
     """Схема для ответа при запросе продукта."""
-    id: int
+    id: uuid.UUID
     status: ProductState
 
     class Config:

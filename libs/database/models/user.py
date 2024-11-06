@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from enum import IntEnum, auto
 from typing import List, Optional, TYPE_CHECKING
 
 from sqlmodel import SQLModel, Field, Relationship
@@ -9,6 +10,13 @@ if TYPE_CHECKING:
     from .product import Product
     from .session import Session
     from .verify import Verification
+
+
+class UserFlag(IntEnum):
+    VERIFIED = auto()
+    COMPANY = auto()
+    MODERATOR = auto()
+    ADMIN = auto()
 
 
 class User(SQLModel, table=True):

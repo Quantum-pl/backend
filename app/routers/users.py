@@ -1,11 +1,10 @@
 import uuid
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import Request, APIRouter, HTTPException, status
 
-from libs.database import SessionDep
-from libs.database.repositories import UserRepository
-from app.middleware.auth import AuthMiddlewareDep
+from app.middleware.auth import authorize
 from app.schemas.user import UserRead
+from libs.database.repositories import UserRepository
 
 router = APIRouter(
     prefix="/users",
@@ -14,21 +13,21 @@ router = APIRouter(
 
 
 @router.get("/me", response_model=UserRead)
-async def read_user_me(
-        current_user: AuthMiddlewareDep
-):
+@authorize()
+async def read_user_me(request: Request):
     """
     Возвращает информацию о текущем авторизованном пользователе.
     """
-    return current_user
+
+    return request.state.current_user
 
 
 @router.get("/{id}", response_model=UserRead)
-async def read_user(id: uuid.UUID, session: SessionDep):
+async def read_user(id: uuid.UUID, request: Request):
     """
     Находит и возвращает информацию о пользователе по имени пользователя.
     """
-    user_repo = UserRepository(session)
+    user_repo = UserRepository(request.state.db)
     user = await user_repo.get(id)
 
     if not user:

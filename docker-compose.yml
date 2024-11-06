@@ -15,6 +15,7 @@ services:
             target: production
         environment:
             DB_HOST: 'postgres'
+            ELASTIC_HOST: 'elastic'
         env_file:
             - .env
         ports:
@@ -45,9 +46,17 @@ services:
             - quantum-network
         image: elasticsearch:8.15.3
         restart: unless-stopped
+        env_file:
+            - .env
+        environment:
+            - "discovery.type=single-node"
+            - "xpack.security.enabled=false"
+        volumes:
+            - quantum-elastic:/usr/share/elasticsearch/data
 
 volumes:
   quantum-postgres:
+  quantum-elastic:
 
 networks:
   quantum-network:

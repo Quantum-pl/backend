@@ -23,7 +23,7 @@ class OrderState(str, Enum):
 class Order(SQLModel, table=True):
     __tablename__ = 'orders'
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="users.id")
 
     status: OrderState = Field(default=OrderState.CREATED)
