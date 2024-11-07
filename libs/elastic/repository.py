@@ -32,12 +32,19 @@ class ElasticRepository(Generic[T]):
             cursor: Optional[str] = None
     ) -> List[T]:
         """Поиск сущностей в Elasticsearch по запросу, фильтрам и пагинации."""
-        must_conditions = [{"multi_match": {"query": query, "fields": fields}}] if query else []
-        filter_conditions = [{"term": {k: v}} for k, v in (filters or {}).items()]
+        must_conditions = [
+            {
+                "multi_match": {
+                    "query": query,
+                    "fields": fields,
+                    "analyzer": "multilingual_analyzer"
+                }
+            }
+        ] if query else []
 
+        filter_conditions = [{"term": {k: v}} for k, v in (filters or {}).items()]
         sort_order = sort if sort else [{"_doc": "asc"}]
 
-        # Убираем параметр search_after, если cursor None
         search_query = {
             "query": {
                 "bool": {
@@ -53,7 +60,13 @@ class ElasticRepository(Generic[T]):
             search_query["search_after"] = cursor
 
         response = await self.es_client.search(index=self.index_name, body=search_query)
-        return [self._map_to_entity(hit["_source"]) for hit in response["hits"]["hits"]]
+        results = []
+        for hit in response["hits"]["hits"]:
+            source = hit["_source"]
+            source["id"] = hit["_id"]  # Добавляем ID в исходные данные
+            results.append(self._map_to_entity(source))
+
+        return results
 
     def _map_to_document(self, entity: T) -> Dict[str, Any]:
         """Преобразует объект SQLModel в документ Elasticsearch."""

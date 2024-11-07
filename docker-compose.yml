@@ -51,6 +51,8 @@ services:
         environment:
             - "discovery.type=single-node"
             - "xpack.security.enabled=false"
+        ports:
+            - ${ELASTIC_PORT}:${ELASTIC_PORT}
         volumes:
             - quantum-elastic:/usr/share/elasticsearch/data
 

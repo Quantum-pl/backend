@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from app.elastic import index_settings
 from app.middleware.deps import add_dependencies
 from app.routers import users, auth, orders, products
 from libs.database import init_db, get_session
@@ -14,7 +15,8 @@ from libs.elastic.client import es_client, sync_elasticsearch
 async def lifespan(app: FastAPI):
     await init_db()
     async for session in get_session():
-        await sync_elasticsearch(session)
+        for name, settings in index_settings.items():
+            await sync_elasticsearch(session, name, settings)
 
     yield
     await es_client.close()
